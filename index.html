@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Comahue Seguridad - Diagnóstico de Seguridad</title>
+<style>
+  :root {
+    --bg: #020c57;
+    --bg-light: #0a1a6e;
+    --accent: #0170B9;
+    --white: #FFFFFF;
+    --gray: #b0b8d0;
+    --green: #22c55e;
+    --yellow: #eab308;
+    --red: #ef4444;
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--white);
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 480px;
+    text-align: center;
+  }
+
+  .screen {
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .logo {
+    width: 200px;
+    margin-bottom: 32px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    color: var(--gray);
+    font-size: 1rem;
+    margin-bottom: 36px;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    padding: 16px 48px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-primary:hover { background: #0185db; }
+
+  /* Progress */
+  .progress-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 32px;
+  }
+
+  .progress-dot {
+    flex: 1;
+    height: 5px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.15);
+    transition: background 0.3s;
+  }
+
+  .progress-dot.done { background: var(--accent); }
+  .progress-dot.current { background: var(--white); }
+
+  .question-number {
+    font-size: 0.85rem;
+    color: var(--gray);
+    margin-bottom: 12px;
+  }
+
+  .question-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 28px;
+    min-height: 80px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option-btn {
+    background: var(--bg-light);
+    border: 2px solid rgba(255,255,255,0.1);
+    color: var(--white);
+    padding: 16px 20px;
+    font-size: 1rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.1s;
+    text-align: left;
+  }
+
+  .option-btn:hover {
+    border-color: var(--accent);
+    background: rgba(1,112,185,0.15);
+  }
+
+  .option-btn:active { transform: scale(0.98); }
+
+  .option-btn.selected {
+    border-color: var(--accent);
+    background: rgba(1,112,185,0.25);
+  }
+
+  /* Result */
+  .result-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+  }
+
+  .result-icon.green { background: rgba(34,197,94,0.2); border: 3px solid var(--green); }
+  .result-icon.yellow { background: rgba(234,179,8,0.2); border: 3px solid var(--yellow); }
+  .result-icon.red { background: rgba(239,68,68,0.2); border: 3px solid var(--red); }
+
+  .result-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; }
+  .result-title.green { color: var(--green); }
+  .result-title.yellow { color: var(--yellow); }
+  .result-title.red { color: var(--red); }
+
+  .result-desc {
+    color: var(--gray);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+
+  .services {
+    text-align: left;
+    background: var(--bg-light);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 28px;
+  }
+
+  .services h3 {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .services ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .services li {
+    font-size: 0.95rem;
+    padding-left: 20px;
+    position: relative;
+  }
+
+  .services li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Contact form */
+  .contact-section {
+    background: var(--bg-light);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .contact-section h3 {
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+  }
+
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    color: var(--white);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input::placeholder { color: rgba(255,255,255,0.35); }
+  .form-group input:focus { border-color: var(--accent); }
+
+  .btn-whatsapp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    background: #25D366;
+    color: var(--white);
+    border: none;
+    padding: 16px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-bottom: 12px;
+    text-decoration: none;
+  }
+
+  .btn-whatsapp:active { transform: scale(0.97); }
+  .btn-whatsapp:hover { background: #1fb855; }
+
+  .btn-whatsapp svg {
+    width: 22px;
+    height: 22px;
+    fill: var(--white);
+  }
+
+  .btn-restart {
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.15);
+    color: var(--gray);
+    padding: 14px;
+    font-size: 0.95rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+
+  .btn-restart:hover { border-color: rgba(255,255,255,0.4); }
+
+  .score-badge {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin-bottom: 20px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.05);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- SCREEN 1: Start -->
+  <div id="screen-start" class="screen active">
+    <img src="logo.png" alt="Comahue Seguridad Privada" class="logo">
+    <h1>¿Qué tan segura es tu empresa?</h1>
+    <p class="subtitle">Descubrilo en menos de 2 minutos</p>
+    <button class="btn-primary" onclick="startQuiz()">COMENZAR</button>
+  </div>
+
+  <!-- SCREEN 2: Quiz -->
+  <div id="screen-quiz" class="screen">
+    <div class="progress-bar" id="progress-bar"></div>
+    <p class="question-number" id="question-number"></p>
+    <p class="question-text" id="question-text"></p>
+    <div class="options" id="options"></div>
+  </div>
+
+  <!-- SCREEN 3: Result -->
+  <div id="screen-result" class="screen">
+    <img src="logo.png" alt="Comahue Seguridad Privada" class="logo" style="width:140px; margin-bottom:24px;">
+    <div class="result-icon" id="result-icon"></div>
+    <p class="result-title" id="result-title"></p>
+    <p class="result-desc" id="result-desc"></p>
+    <div class="score-badge" id="score-badge"></div>
+
+    <div class="services">
+      <h3>Nuestros servicios</h3>
+      <ul>
+        <li>Seguridad física</li>
+        <li>Seguridad electrónica</li>
+        <li>Monitoreo 24/7</li>
+        <li>Control de accesos</li>
+        <li>Alarmas monitoreadas</li>
+        <li>Auditoría y evaluación de riesgos</li>
+        <li>Soluciones integrales de seguridad</li>
+      </ul>
+    </div>
+
+    <div class="contact-section">
+      <h3>¿Querés que te contactemos?</h3>
+      <div class="form-group">
+        <input type="text" id="input-name" placeholder="Tu nombre">
+      </div>
+      <div class="form-group">
+        <input type="text" id="input-company" placeholder="Empresa">
+      </div>
+      <div class="form-group">
+        <input type="tel" id="input-phone" placeholder="Teléfono">
+      </div>
+    </div>
+
+    <a id="btn-whatsapp" class="btn-whatsapp" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      SOLICITAR PRESUPUESTO
+    </a>
+    <button class="btn-restart" onclick="restart()">VOLVER A EMPEZAR</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    text: '¿Tu empresa cuenta con vigilancia física?',
+    options: [
+      { label: 'Sí, tercerizada', points: 3 },
+      { label: 'Sí, propia', points: 2 },
+      { label: 'No', points: 0 }
+    ]
+  },
+  {
+    text: '¿Contás con cámaras de seguridad?',
+    options: [
+      { label: 'Sí, con monitoreo permanente', points: 3 },
+      { label: 'Sí, pero sin monitoreo permanente', points: 1 },
+      { label: 'No', points: 0 }
+    ]
+  },
+  {
+    text: '¿Qué sucede cuando se detecta una intrusión fuera del horario laboral?',
+    options: [
+      { label: 'Tenemos respuesta inmediata', points: 3 },
+      { label: 'Tenemos protocolo, pero depende del personal disponible', points: 1 },
+      { label: 'No contamos con un procedimiento definido', points: 0 }
+    ]
+  },
+  {
+    text: '¿Quién controla actualmente los accesos a tu establecimiento?',
+    options: [
+      { label: 'Personal de seguridad', points: 3 },
+      { label: 'Personal propio', points: 2 },
+      { label: 'Sistema electrónico', points: 2 },
+      { label: 'No tenemos control de acceso', points: 0 }
+    ]
+  },
+  {
+    text: '¿Tu empresa tiene identificados y evaluados sus principales riesgos de seguridad?',
+    options: [
+      { label: 'Sí, periódicamente', points: 3 },
+      { label: 'Parcialmente', points: 1 },
+      { label: 'No', points: 0 }
+    ]
+  },
+  {
+    text: '¿Tenés un sistema que integre seguridad física, electrónica y procedimientos?',
+    options: [
+      { label: 'Sí', points: 3 },
+      { label: 'Parcialmente', points: 1 },
+      { label: 'No', points: 0 }
+    ]
+  }
+];
+
+let currentQuestion = 0;
+let totalScore = 0;
+const WHATSAPP_NUMBER = '5491176212846';
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const screen = document.getElementById(id);
+  screen.classList.remove('active');
+  // Force reflow for animation restart
+  void screen.offsetWidth;
+  screen.classList.add('active');
+}
+
+function renderProgress() {
+  const bar = document.getElementById('progress-bar');
+  bar.innerHTML = '';
+  for (let i = 0; i < questions.length; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot';
+    if (i < currentQuestion) dot.classList.add('done');
+    if (i === currentQuestion) dot.classList.add('current');
+    bar.appendChild(dot);
+  }
+}
+
+function renderQuestion() {
+  const q = questions[currentQuestion];
+  document.getElementById('question-number').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+  document.getElementById('question-text').textContent = q.text;
+
+  const optionsEl = document.getElementById('options');
+  optionsEl.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt.label;
+    btn.onclick = () => selectOption(i, opt.points);
+    optionsEl.appendChild(btn);
+  });
+
+  renderProgress();
+}
+
+function selectOption(index, points) {
+  const buttons = document.querySelectorAll('.option-btn');
+  buttons.forEach(b => b.classList.remove('selected'));
+  buttons[index].classList.add('selected');
+
+  totalScore += points;
+
+  setTimeout(() => {
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+      showScreen('screen-quiz');
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }, 350);
+}
+
+function showResult() {
+  let level, title, desc, icon, colorClass;
+  const maxScore = 18;
+
+  if (totalScore >= 13) {
+    colorClass = 'green';
+    icon = '\u2714';
+    title = 'EMPRESA PREPARADA';
+    desc = 'Tenés buenas herramientas de prevención y control. Siempre existen oportunidades de mejora para mantener tu empresa en el más alto nivel de seguridad.';
+  } else if (totalScore >= 7) {
+    colorClass = 'yellow';
+    icon = '\u26A0';
+    title = 'CON OPORTUNIDADES DE MEJORA';
+    desc = 'Contás con algunas medidas de seguridad, pero existen puntos que podrían fortalecerse para proteger mejor tu empresa.';
+  } else {
+    colorClass = 'red';
+    icon = '\u2718';
+    title = 'EMPRESA EXPUESTA';
+    desc = 'Existen aspectos importantes de seguridad que deberían ser evaluados y reforzados cuanto antes para proteger tu empresa.';
+  }
+
+  document.getElementById('result-icon').className = `result-icon ${colorClass}`;
+  document.getElementById('result-icon').textContent = icon;
+  document.getElementById('result-title').className = `result-title ${colorClass}`;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-desc').textContent = desc;
+  document.getElementById('score-badge').textContent = `Puntaje: ${totalScore} / ${maxScore}`;
+
+  updateWhatsAppLink(title);
+  showScreen('screen-result');
+}
+
+function updateWhatsAppLink(resultTitle) {
+  const btn = document.getElementById('btn-whatsapp');
+  btn.onclick = (e) => {
+    e.preventDefault();
+    const name = document.getElementById('input-name').value.trim();
+    const company = document.getElementById('input-company').value.trim();
+    const phone = document.getElementById('input-phone').value.trim();
+
+    let msg = `Hola! Hice el diagnóstico de seguridad en la Expo Industrias y mi resultado fue: *${resultTitle}* (${totalScore}/18 puntos).`;
+
+    if (name || company || phone) {
+      msg += '\n\n';
+      if (name) msg += `Nombre: ${name}\n`;
+      if (company) msg += `Empresa: ${company}\n`;
+      if (phone) msg += `Teléfono: ${phone}\n`;
+    }
+
+    msg += '\nMe gustaría recibir más información sobre sus servicios de seguridad.';
+
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+  };
+}
+
+function startQuiz() {
+  currentQuestion = 0;
+  totalScore = 0;
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+function restart() {
+  document.getElementById('input-name').value = '';
+  document.getElementById('input-company').value = '';
+  document.getElementById('input-phone').value = '';
+  currentQuestion = 0;
+  totalScore = 0;
+  showScreen('screen-start');
+}
+</script>
+</body>
+</html>

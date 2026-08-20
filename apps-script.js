@@ -1,6 +1,6 @@
 function doPost(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = JSON.parse(e.postData.contents);
+  var data = JSON.parse(e.parameter.data);
 
   sheet.appendRow([
     new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' }),

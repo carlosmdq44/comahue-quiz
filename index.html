@@ -7,110 +7,196 @@
 <style>
   :root {
     --bg: #020c57;
-    --bg-light: #0a1a6e;
+    --bg-deep: #010836;
+    --bg-light: rgba(255,255,255,0.06);
     --accent: #0170B9;
+    --accent-glow: rgba(1,112,185,0.4);
     --white: #FFFFFF;
     --gray: #b0b8d0;
     --green: #22c55e;
     --yellow: #eab308;
     --red: #ef4444;
-    --radius: 12px;
+    --radius: 14px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--bg);
+    background: linear-gradient(160deg, var(--bg-deep) 0%, var(--bg) 40%, #0a1a6e 100%);
     color: var(--white);
     min-height: 100dvh;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 20px;
+    overflow-x: hidden;
+  }
+
+  /* Ambient background glow */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 20%, rgba(1,112,185,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(34,197,94,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
   }
 
   .container {
     width: 100%;
     max-width: 480px;
     text-align: center;
+    position: relative;
+    z-index: 1;
   }
 
+  /* Screen transitions */
   .screen {
     display: none;
-    animation: fadeIn 0.4s ease;
+    animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .screen.active { display: block; }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
   }
 
+  /* Glassmorphism card */
+  .glass-card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  /* Logo */
   .logo {
     width: 200px;
     margin-bottom: 32px;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
   }
 
+  /* Shield icon */
+  .shield-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 28px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .shield-icon svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 20px var(--accent-glow));
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* Title with gradient */
   h1 {
-    font-size: 1.6rem;
-    font-weight: 700;
+    font-size: 1.7rem;
+    font-weight: 800;
     line-height: 1.3;
     margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--white) 0%, #a8c8ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .subtitle {
     color: var(--gray);
     font-size: 1rem;
-    margin-bottom: 36px;
+    margin-bottom: 40px;
   }
 
+  /* Pulsing CTA button */
   .btn-primary {
     display: inline-block;
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent) 0%, #0190e8 100%);
     color: var(--white);
     border: none;
-    padding: 16px 48px;
-    font-size: 1.1rem;
-    font-weight: 600;
+    padding: 18px 56px;
+    font-size: 1.15rem;
+    font-weight: 700;
     border-radius: var(--radius);
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
+    transition: transform 0.15s;
     text-decoration: none;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    position: relative;
+    box-shadow: 0 4px 24px var(--accent-glow);
+    animation: pulse 2s ease-in-out infinite;
   }
 
-  .btn-primary:active { transform: scale(0.97); }
-  .btn-primary:hover { background: #0185db; }
+  .btn-primary:active { transform: scale(0.95); animation: none; }
 
-  /* Progress */
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 4px 24px var(--accent-glow); }
+    50% { box-shadow: 0 4px 40px rgba(1,112,185,0.6); }
+  }
+
+  /* Progress bar */
+  .progress-wrapper {
+    margin-bottom: 32px;
+  }
+
   .progress-bar {
     display: flex;
     gap: 6px;
-    margin-bottom: 32px;
+    margin-bottom: 8px;
   }
 
   .progress-dot {
     flex: 1;
     height: 5px;
     border-radius: 3px;
-    background: rgba(255,255,255,0.15);
-    transition: background 0.3s;
+    background: rgba(255,255,255,0.1);
+    transition: background 0.4s, box-shadow 0.4s;
+    overflow: hidden;
   }
 
-  .progress-dot.done { background: var(--accent); }
-  .progress-dot.current { background: var(--white); }
+  .progress-dot.done {
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+
+  .progress-dot.current {
+    background: var(--white);
+    box-shadow: 0 0 8px rgba(255,255,255,0.3);
+  }
+
+  .progress-text {
+    font-size: 0.8rem;
+    color: var(--gray);
+    text-align: right;
+  }
 
   .question-number {
     font-size: 0.85rem;
-    color: var(--gray);
-    margin-bottom: 12px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
   }
 
   .question-text {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-size: 1.3rem;
+    font-weight: 700;
     line-height: 1.4;
     margin-bottom: 28px;
     min-height: 80px;
@@ -123,106 +209,155 @@
   }
 
   .option-btn {
-    background: var(--bg-light);
-    border: 2px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.08);
     color: var(--white);
-    padding: 16px 20px;
+    padding: 18px 20px;
     font-size: 1rem;
     border-radius: var(--radius);
     cursor: pointer;
-    transition: border-color 0.2s, background 0.2s, transform 0.1s;
+    transition: all 0.25s ease;
     text-align: left;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(1,112,185,0.2) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.25s;
   }
 
   .option-btn:hover {
     border-color: var(--accent);
-    background: rgba(1,112,185,0.15);
+    transform: translateX(4px);
   }
 
-  .option-btn:active { transform: scale(0.98); }
+  .option-btn:hover::before { opacity: 1; }
+  .option-btn:active { transform: translateX(4px) scale(0.98); }
 
   .option-btn.selected {
     border-color: var(--accent);
-    background: rgba(1,112,185,0.25);
+    background: rgba(1,112,185,0.2);
+    box-shadow: 0 0 20px var(--accent-glow);
   }
 
-  /* Result */
+  /* Result screen */
   .result-icon {
-    width: 100px;
-    height: 100px;
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
     margin: 0 auto 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
+    font-size: 3.2rem;
+    animation: resultPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
   }
 
-  .result-icon.green { background: rgba(34,197,94,0.2); border: 3px solid var(--green); }
-  .result-icon.yellow { background: rgba(234,179,8,0.2); border: 3px solid var(--yellow); }
-  .result-icon.red { background: rgba(239,68,68,0.2); border: 3px solid var(--red); }
+  @keyframes resultPop {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
 
-  .result-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; }
-  .result-title.green { color: var(--green); }
-  .result-title.yellow { color: var(--yellow); }
-  .result-title.red { color: var(--red); }
+  .result-icon.green {
+    background: rgba(34,197,94,0.15);
+    border: 3px solid var(--green);
+    box-shadow: 0 0 40px rgba(34,197,94,0.3);
+  }
+
+  .result-icon.yellow {
+    background: rgba(234,179,8,0.15);
+    border: 3px solid var(--yellow);
+    box-shadow: 0 0 40px rgba(234,179,8,0.3);
+  }
+
+  .result-icon.red {
+    background: rgba(239,68,68,0.15);
+    border: 3px solid var(--red);
+    box-shadow: 0 0 40px rgba(239,68,68,0.3);
+  }
+
+  .result-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .result-title.green { color: var(--green); text-shadow: 0 0 20px rgba(34,197,94,0.4); }
+  .result-title.yellow { color: var(--yellow); text-shadow: 0 0 20px rgba(234,179,8,0.4); }
+  .result-title.red { color: var(--red); text-shadow: 0 0 20px rgba(239,68,68,0.4); }
 
   .result-desc {
     color: var(--gray);
     font-size: 0.95rem;
-    line-height: 1.5;
-    margin-bottom: 28px;
+    line-height: 1.6;
+    margin-bottom: 24px;
   }
 
+  .score-badge {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin-bottom: 24px;
+    padding: 8px 18px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* Services */
   .services {
     text-align: left;
-    background: var(--bg-light);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 28px;
   }
 
   .services h3 {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--gray);
-    margin-bottom: 14px;
+    margin-bottom: 16px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
   }
 
   .services ul {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
 
   .services li {
     font-size: 0.95rem;
-    padding-left: 20px;
-    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 
-  .services li::before {
-    content: '>';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    font-weight: 700;
+  .service-icon {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 8px;
+    background: rgba(1,112,185,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
   }
 
   /* Contact form */
-  .contact-section {
-    background: var(--bg-light);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 20px;
-    text-align: left;
-  }
-
   .contact-section h3 {
     font-size: 0.95rem;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
+    text-align: left;
   }
 
   .form-group {
@@ -231,69 +366,101 @@
 
   .form-group input {
     width: 100%;
-    padding: 12px 14px;
-    border: 2px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    background: rgba(255,255,255,0.05);
+    padding: 14px 16px;
+    border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
     color: var(--white);
     font-size: 0.95rem;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
   }
 
-  .form-group input::placeholder { color: rgba(255,255,255,0.35); }
-  .form-group input:focus { border-color: var(--accent); }
+  .form-group input::placeholder { color: rgba(255,255,255,0.3); }
 
+  .form-group input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  /* WhatsApp button */
   .btn-whatsapp {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     width: 100%;
-    background: #25D366;
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
     color: var(--white);
     border: none;
-    padding: 16px;
-    font-size: 1.05rem;
-    font-weight: 600;
+    padding: 18px;
+    font-size: 1.1rem;
+    font-weight: 700;
     border-radius: var(--radius);
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
+    transition: transform 0.15s, box-shadow 0.2s;
     margin-bottom: 12px;
     text-decoration: none;
+    box-shadow: 0 4px 20px rgba(37,211,102,0.3);
   }
 
   .btn-whatsapp:active { transform: scale(0.97); }
-  .btn-whatsapp:hover { background: #1fb855; }
+  .btn-whatsapp:hover { box-shadow: 0 4px 30px rgba(37,211,102,0.5); }
 
   .btn-whatsapp svg {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     fill: var(--white);
   }
 
   .btn-restart {
     background: transparent;
-    border: 2px solid rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.1);
     color: var(--gray);
     padding: 14px;
     font-size: 0.95rem;
     border-radius: var(--radius);
     cursor: pointer;
     width: 100%;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, color 0.2s;
   }
 
-  .btn-restart:hover { border-color: rgba(255,255,255,0.4); }
+  .btn-restart:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
 
-  .score-badge {
-    display: inline-block;
-    font-size: 0.8rem;
-    color: var(--gray);
-    margin-bottom: 20px;
+  /* Confetti canvas */
+  #confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* Expo badge */
+  .expo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--accent);
     padding: 6px 14px;
     border-radius: 20px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(1,112,185,0.1);
+    border: 1px solid rgba(1,112,185,0.2);
+    margin-bottom: 24px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* ISO badge */
+  .iso-badge {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.4);
+    margin-top: 20px;
+    letter-spacing: 0.5px;
   }
 </style>
 </head>
@@ -303,14 +470,31 @@
   <!-- SCREEN 1: Start -->
   <div id="screen-start" class="screen active">
     <img src="logo.png" alt="Comahue Seguridad Privada" class="logo">
-    <h1>¿Qué tan segura es tu empresa?</h1>
+
+    <div class="expo-badge">
+      <span>&#9670;</span> Expo Industrias 2026
+    </div>
+
+    <div class="shield-icon">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M32 4L8 16v16c0 14.4 10.24 27.84 24 32 13.76-4.16 24-17.6 24-32V16L32 4z" fill="rgba(1,112,185,0.2)" stroke="#0170B9" stroke-width="2.5"/>
+        <path d="M28 33l-5-5 2.5-2.5L28 28l10.5-10.5L41 20 28 33z" fill="#0170B9"/>
+      </svg>
+    </div>
+
+    <h1>&#191;Qu&#233; tan segura es tu empresa?</h1>
     <p class="subtitle">Descubrilo en menos de 2 minutos</p>
     <button class="btn-primary" onclick="startQuiz()">COMENZAR</button>
+
+    <p class="iso-badge">ISO 9001 &middot; ISO 14001 &middot; ISO 45001</p>
   </div>
 
   <!-- SCREEN 2: Quiz -->
   <div id="screen-quiz" class="screen">
-    <div class="progress-bar" id="progress-bar"></div>
+    <div class="progress-wrapper">
+      <div class="progress-bar" id="progress-bar"></div>
+      <p class="progress-text" id="progress-text"></p>
+    </div>
     <p class="question-number" id="question-number"></p>
     <p class="question-text" id="question-text"></p>
     <div class="options" id="options"></div>
@@ -318,35 +502,36 @@
 
   <!-- SCREEN 3: Result -->
   <div id="screen-result" class="screen">
-    <img src="logo.png" alt="Comahue Seguridad Privada" class="logo" style="width:140px; margin-bottom:24px;">
+    <canvas id="confetti-canvas"></canvas>
+    <img src="logo.png" alt="Comahue Seguridad Privada" class="logo" style="width:150px; margin-bottom:20px;">
     <div class="result-icon" id="result-icon"></div>
     <p class="result-title" id="result-title"></p>
     <p class="result-desc" id="result-desc"></p>
     <div class="score-badge" id="score-badge"></div>
 
-    <div class="services">
+    <div class="glass-card services">
       <h3>Nuestros servicios</h3>
       <ul>
-        <li>Seguridad física</li>
-        <li>Seguridad electrónica</li>
-        <li>Monitoreo 24/7</li>
-        <li>Control de accesos</li>
-        <li>Alarmas monitoreadas</li>
-        <li>Auditoría y evaluación de riesgos</li>
-        <li>Soluciones integrales de seguridad</li>
+        <li><span class="service-icon">&#128110;</span> Seguridad f&#237;sica</li>
+        <li><span class="service-icon">&#128249;</span> Seguridad electr&#243;nica</li>
+        <li><span class="service-icon">&#128225;</span> Monitoreo 24/7</li>
+        <li><span class="service-icon">&#128272;</span> Control de accesos</li>
+        <li><span class="service-icon">&#128276;</span> Alarmas monitoreadas</li>
+        <li><span class="service-icon">&#128203;</span> Auditor&#237;a y evaluaci&#243;n de riesgos</li>
+        <li><span class="service-icon">&#127760;</span> Soluciones integrales</li>
       </ul>
     </div>
 
-    <div class="contact-section">
-      <h3>¿Querés que te contactemos?</h3>
+    <div class="glass-card contact-section">
+      <h3>&#191;Quer&#233;s que te contactemos?</h3>
       <div class="form-group">
-        <input type="text" id="input-name" placeholder="Tu nombre">
+        <input type="text" id="input-name" placeholder="Tu nombre" autocomplete="off">
       </div>
       <div class="form-group">
-        <input type="text" id="input-company" placeholder="Empresa">
+        <input type="text" id="input-company" placeholder="Empresa" autocomplete="off">
       </div>
       <div class="form-group">
-        <input type="tel" id="input-phone" placeholder="Teléfono">
+        <input type="tel" id="input-phone" placeholder="Tel&#233;fono" autocomplete="off">
       </div>
     </div>
 
@@ -362,23 +547,23 @@
 <script>
 const questions = [
   {
-    text: '¿Tu empresa cuenta con vigilancia física?',
+    text: '\u00bfTu empresa cuenta con vigilancia f\u00edsica?',
     options: [
-      { label: 'Sí, tercerizada', points: 3 },
-      { label: 'Sí, propia', points: 2 },
+      { label: 'S\u00ed, tercerizada', points: 3 },
+      { label: 'S\u00ed, propia', points: 2 },
       { label: 'No', points: 0 }
     ]
   },
   {
-    text: '¿Contás con cámaras de seguridad?',
+    text: '\u00bfCont\u00e1s con c\u00e1maras de seguridad?',
     options: [
-      { label: 'Sí, con monitoreo permanente', points: 3 },
-      { label: 'Sí, pero sin monitoreo permanente', points: 1 },
+      { label: 'S\u00ed, con monitoreo permanente', points: 3 },
+      { label: 'S\u00ed, pero sin monitoreo permanente', points: 1 },
       { label: 'No', points: 0 }
     ]
   },
   {
-    text: '¿Qué sucede cuando se detecta una intrusión fuera del horario laboral?',
+    text: '\u00bfQu\u00e9 sucede cuando se detecta una intrusi\u00f3n fuera del horario laboral?',
     options: [
       { label: 'Tenemos respuesta inmediata', points: 3 },
       { label: 'Tenemos protocolo, pero depende del personal disponible', points: 1 },
@@ -386,26 +571,26 @@ const questions = [
     ]
   },
   {
-    text: '¿Quién controla actualmente los accesos a tu establecimiento?',
+    text: '\u00bfQui\u00e9n controla actualmente los accesos a tu establecimiento?',
     options: [
       { label: 'Personal de seguridad', points: 3 },
       { label: 'Personal propio', points: 2 },
-      { label: 'Sistema electrónico', points: 2 },
+      { label: 'Sistema electr\u00f3nico', points: 2 },
       { label: 'No tenemos control de acceso', points: 0 }
     ]
   },
   {
-    text: '¿Tu empresa tiene identificados y evaluados sus principales riesgos de seguridad?',
+    text: '\u00bfTu empresa tiene identificados y evaluados sus principales riesgos de seguridad?',
     options: [
-      { label: 'Sí, periódicamente', points: 3 },
+      { label: 'S\u00ed, peri\u00f3dicamente', points: 3 },
       { label: 'Parcialmente', points: 1 },
       { label: 'No', points: 0 }
     ]
   },
   {
-    text: '¿Tenés un sistema que integre seguridad física, electrónica y procedimientos?',
+    text: '\u00bfTen\u00e9s un sistema que integre seguridad f\u00edsica, electr\u00f3nica y procedimientos?',
     options: [
-      { label: 'Sí', points: 3 },
+      { label: 'S\u00ed', points: 3 },
       { label: 'Parcialmente', points: 1 },
       { label: 'No', points: 0 }
     ]
@@ -420,9 +605,9 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const screen = document.getElementById(id);
   screen.classList.remove('active');
-  // Force reflow for animation restart
   void screen.offsetWidth;
   screen.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function renderProgress() {
@@ -435,6 +620,8 @@ function renderProgress() {
     if (i === currentQuestion) dot.classList.add('current');
     bar.appendChild(dot);
   }
+  const pct = Math.round(((currentQuestion) / questions.length) * 100);
+  document.getElementById('progress-text').textContent = `${pct}% completado`;
 }
 
 function renderQuestion() {
@@ -448,6 +635,7 @@ function renderQuestion() {
     const btn = document.createElement('button');
     btn.className = 'option-btn';
     btn.textContent = opt.label;
+    btn.style.animationDelay = `${i * 0.08}s`;
     btn.onclick = () => selectOption(i, opt.points);
     optionsEl.appendChild(btn);
   });
@@ -457,7 +645,7 @@ function renderQuestion() {
 
 function selectOption(index, points) {
   const buttons = document.querySelectorAll('.option-btn');
-  buttons.forEach(b => b.classList.remove('selected'));
+  buttons.forEach(b => { b.classList.remove('selected'); b.style.pointerEvents = 'none'; });
   buttons[index].classList.add('selected');
 
   totalScore += points;
@@ -470,28 +658,28 @@ function selectOption(index, points) {
     } else {
       showResult();
     }
-  }, 350);
+  }, 400);
 }
 
 function showResult() {
-  let level, title, desc, icon, colorClass;
+  let title, desc, icon, colorClass;
   const maxScore = 18;
 
   if (totalScore >= 13) {
     colorClass = 'green';
     icon = '\u2714';
     title = 'EMPRESA PREPARADA';
-    desc = 'Tenés buenas herramientas de prevención y control. Siempre existen oportunidades de mejora para mantener tu empresa en el más alto nivel de seguridad.';
+    desc = 'Ten\u00e9s buenas herramientas de prevenci\u00f3n y control. Siempre existen oportunidades de mejora para mantener tu empresa en el m\u00e1s alto nivel de seguridad.';
   } else if (totalScore >= 7) {
     colorClass = 'yellow';
     icon = '\u26A0';
     title = 'CON OPORTUNIDADES DE MEJORA';
-    desc = 'Contás con algunas medidas de seguridad, pero existen puntos que podrían fortalecerse para proteger mejor tu empresa.';
+    desc = 'Cont\u00e1s con algunas medidas de seguridad, pero existen puntos que podr\u00edan fortalecerse para proteger mejor tu empresa.';
   } else {
     colorClass = 'red';
     icon = '\u2718';
     title = 'EMPRESA EXPUESTA';
-    desc = 'Existen aspectos importantes de seguridad que deberían ser evaluados y reforzados cuanto antes para proteger tu empresa.';
+    desc = 'Existen aspectos importantes de seguridad que deber\u00edan ser evaluados y reforzados cuanto antes para proteger tu empresa.';
   }
 
   document.getElementById('result-icon').className = `result-icon ${colorClass}`;
@@ -503,6 +691,10 @@ function showResult() {
 
   updateWhatsAppLink(title);
   showScreen('screen-result');
+
+  if (colorClass === 'green') {
+    launchConfetti();
+  }
 }
 
 function updateWhatsAppLink(resultTitle) {
@@ -513,16 +705,16 @@ function updateWhatsAppLink(resultTitle) {
     const company = document.getElementById('input-company').value.trim();
     const phone = document.getElementById('input-phone').value.trim();
 
-    let msg = `Hola! Hice el diagnóstico de seguridad en la Expo Industrias y mi resultado fue: *${resultTitle}* (${totalScore}/18 puntos).`;
+    let msg = `Hola! Hice el diagn\u00f3stico de seguridad en la Expo Industrias y mi resultado fue: *${resultTitle}* (${totalScore}/18 puntos).`;
 
     if (name || company || phone) {
       msg += '\n\n';
       if (name) msg += `Nombre: ${name}\n`;
       if (company) msg += `Empresa: ${company}\n`;
-      if (phone) msg += `Teléfono: ${phone}\n`;
+      if (phone) msg += `Tel\u00e9fono: ${phone}\n`;
     }
 
-    msg += '\nMe gustaría recibir más información sobre sus servicios de seguridad.';
+    msg += '\nMe gustar\u00eda recibir m\u00e1s informaci\u00f3n sobre sus servicios de seguridad.';
 
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
@@ -542,7 +734,69 @@ function restart() {
   document.getElementById('input-phone').value = '';
   currentQuestion = 0;
   totalScore = 0;
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   showScreen('screen-start');
+}
+
+/* Confetti for green result */
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+
+  const colors = ['#22c55e', '#0170B9', '#FFFFFF', '#eab308', '#a78bfa'];
+  const particles = [];
+
+  for (let i = 0; i < 80; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      w: Math.random() * 8 + 4,
+      h: Math.random() * 6 + 2,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vy: Math.random() * 3 + 2,
+      vx: (Math.random() - 0.5) * 2,
+      rot: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 10,
+      opacity: 1
+    });
+  }
+
+  let frame = 0;
+  const maxFrames = 180;
+
+  function animate() {
+    if (frame > maxFrames) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach(p => {
+      p.y += p.vy;
+      p.x += p.vx;
+      p.rot += p.rotSpeed;
+      if (frame > maxFrames - 60) {
+        p.opacity = Math.max(0, p.opacity - 0.02);
+      }
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rot * Math.PI) / 180);
+      ctx.globalAlpha = p.opacity;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+
+    frame++;
+    requestAnimationFrame(animate);
+  }
+
+  animate();
 }
 </script>
 </body>

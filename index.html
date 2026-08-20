@@ -756,6 +756,8 @@ function sendData() {
   btn.classList.add('sent');
   document.getElementById('send-status').style.color = 'var(--green)';
   document.getElementById('send-status').textContent = 'Tus datos fueron registrados correctamente';
+
+  setTimeout(() => { restart(); }, 2000);
 }
 
 function saveToSheet(resultTitle) {

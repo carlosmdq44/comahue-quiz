@@ -770,12 +770,8 @@ function saveToSheet(resultTitle) {
     telefono: document.getElementById('input-phone').value.trim(),
     email: document.getElementById('input-email').value.trim()
   };
-  const form = new FormData();
-  form.append('data', JSON.stringify(data));
-  fetch(GOOGLE_SHEET_URL, {
-    method: 'POST',
-    body: form
-  }).catch(() => {});
+  const url = GOOGLE_SHEET_URL + '?data=' + encodeURIComponent(JSON.stringify(data));
+  fetch(url, { method: 'GET', mode: 'no-cors' }).catch(() => {});
 }
 
 function updateWhatsAppLink(resultTitle) {

@@ -425,6 +425,38 @@
     transition: border-color 0.2s, color 0.2s;
   }
 
+  .btn-send {
+    width: 100%;
+    padding: 14px;
+    margin-top: 12px;
+    background: linear-gradient(135deg, var(--accent) 0%, #0190e8 100%);
+    color: var(--white);
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 16px var(--accent-glow);
+    letter-spacing: 0.5px;
+  }
+
+  .btn-send:active { transform: scale(0.97); }
+  .btn-send:hover { box-shadow: 0 4px 24px rgba(1,112,185,0.5); }
+
+  .btn-send.sent {
+    background: linear-gradient(135deg, var(--green) 0%, #16a34a 100%);
+    box-shadow: 0 4px 16px rgba(34,197,94,0.3);
+    pointer-events: none;
+  }
+
+  .send-status {
+    font-size: 0.8rem;
+    color: var(--green);
+    margin-top: 8px;
+    min-height: 20px;
+  }
+
   .btn-restart:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
 
   /* Confetti canvas */
@@ -536,6 +568,8 @@
       <div class="form-group">
         <input type="email" id="input-email" placeholder="Email" autocomplete="off">
       </div>
+      <button class="btn-send" id="btn-send" onclick="sendData()">ENVIAR DATOS</button>
+      <p class="send-status" id="send-status"></p>
     </div>
 
     <a id="btn-whatsapp" class="btn-whatsapp" href="#" target="_blank" rel="noopener">
@@ -693,13 +727,35 @@ function showResult() {
   document.getElementById('result-desc').textContent = desc;
   document.getElementById('score-badge').textContent = `Puntaje: ${totalScore} / ${maxScore}`;
 
+  currentResultTitle = title;
   updateWhatsAppLink(title);
   showScreen('screen-result');
-  saveToSheet(title);
 
   if (colorClass === 'green') {
     launchConfetti();
   }
+}
+
+let currentResultTitle = '';
+
+function sendData() {
+  const name = document.getElementById('input-name').value.trim();
+  const company = document.getElementById('input-company').value.trim();
+  const phone = document.getElementById('input-phone').value.trim();
+  const email = document.getElementById('input-email').value.trim();
+
+  if (!name && !company && !phone && !email) {
+    document.getElementById('send-status').textContent = 'Complet\u00e1 al menos un campo';
+    document.getElementById('send-status').style.color = 'var(--yellow)';
+    return;
+  }
+
+  saveToSheet(currentResultTitle);
+  const btn = document.getElementById('btn-send');
+  btn.textContent = '\u2714 DATOS ENVIADOS';
+  btn.classList.add('sent');
+  document.getElementById('send-status').style.color = 'var(--green)';
+  document.getElementById('send-status').textContent = 'Tus datos fueron registrados correctamente';
 }
 
 function saveToSheet(resultTitle) {
@@ -761,6 +817,9 @@ function restart() {
   document.getElementById('input-company').value = '';
   document.getElementById('input-phone').value = '';
   document.getElementById('input-email').value = '';
+  document.getElementById('btn-send').textContent = 'ENVIAR DATOS';
+  document.getElementById('btn-send').classList.remove('sent');
+  document.getElementById('send-status').textContent = '';
   currentQuestion = 0;
   totalScore = 0;
   const canvas = document.getElementById('confetti-canvas');

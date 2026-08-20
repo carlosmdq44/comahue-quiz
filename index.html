@@ -533,6 +533,9 @@
       <div class="form-group">
         <input type="tel" id="input-phone" placeholder="Tel&#233;fono" autocomplete="off">
       </div>
+      <div class="form-group">
+        <input type="email" id="input-email" placeholder="Email" autocomplete="off">
+      </div>
     </div>
 
     <a id="btn-whatsapp" class="btn-whatsapp" href="#" target="_blank" rel="noopener">
@@ -600,6 +603,7 @@ const questions = [
 let currentQuestion = 0;
 let totalScore = 0;
 const WHATSAPP_NUMBER = '5491176212846';
+const GOOGLE_SHEET_URL = 'PEGAR_URL_AQUI';
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -691,10 +695,29 @@ function showResult() {
 
   updateWhatsAppLink(title);
   showScreen('screen-result');
+  saveToSheet(title);
 
   if (colorClass === 'green') {
     launchConfetti();
   }
+}
+
+function saveToSheet(resultTitle) {
+  if (GOOGLE_SHEET_URL === 'PEGAR_URL_AQUI') return;
+  const data = {
+    resultado: resultTitle,
+    puntaje: totalScore + '/18',
+    nombre: document.getElementById('input-name').value.trim(),
+    empresa: document.getElementById('input-company').value.trim(),
+    telefono: document.getElementById('input-phone').value.trim(),
+    email: document.getElementById('input-email').value.trim()
+  };
+  fetch(GOOGLE_SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).catch(() => {});
 }
 
 function updateWhatsAppLink(resultTitle) {
@@ -704,14 +727,19 @@ function updateWhatsAppLink(resultTitle) {
     const name = document.getElementById('input-name').value.trim();
     const company = document.getElementById('input-company').value.trim();
     const phone = document.getElementById('input-phone').value.trim();
+    const email = document.getElementById('input-email').value.trim();
+
+    // Guardar datos actualizados al sheet antes de abrir WhatsApp
+    saveToSheet(resultTitle);
 
     let msg = `Hola! Hice el diagn\u00f3stico de seguridad en la Expo Industrias y mi resultado fue: *${resultTitle}* (${totalScore}/18 puntos).`;
 
-    if (name || company || phone) {
+    if (name || company || phone || email) {
       msg += '\n\n';
       if (name) msg += `Nombre: ${name}\n`;
       if (company) msg += `Empresa: ${company}\n`;
       if (phone) msg += `Tel\u00e9fono: ${phone}\n`;
+      if (email) msg += `Email: ${email}\n`;
     }
 
     msg += '\nMe gustar\u00eda recibir m\u00e1s informaci\u00f3n sobre sus servicios de seguridad.';
@@ -732,6 +760,7 @@ function restart() {
   document.getElementById('input-name').value = '';
   document.getElementById('input-company').value = '';
   document.getElementById('input-phone').value = '';
+  document.getElementById('input-email').value = '';
   currentQuestion = 0;
   totalScore = 0;
   const canvas = document.getElementById('confetti-canvas');
